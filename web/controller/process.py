@@ -1,13 +1,13 @@
-import random
+# controller/web.py
 import utime
 from machine import Pin
 from modules import network
+from web.model import model
 
-class Web_server:
+class WebServer:
     def __init__(self):
         self.network = network.Network()
-        self.state = "OFF"
-        self.random_value = 0
+        self.model = model.DataModel()
         self.connection_id = 0
         print("Web_server init.....")
 
@@ -22,46 +22,26 @@ class Web_server:
         elif request == '/lighton?':
             print("LED on")
             led.value(1)
+            self.model.toggle_led("ON")
             return "ON"
         elif request == '/lightoff?':
+            print("LED off")
             led.value(0)
-            return 'OFF'
+            self.model.toggle_led("OFF")
+            return "OFF"
         elif request == '/value?':
-            return random.randint(0, 20)
+            value = self.model.fetch_random_value()
+            return value
         else:
             print("process_error:", request)
         return None
 
-        # HTML template for the webpage
     def webpage(self):
-        html = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>IOT Server</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-            </head>
-            <body>
-                <h1>IOT Server</h1>
-                <h2>Led Control</h2>
-                <form action="./lighton">
-                    <input type="submit" value="Light on" />
-                </form>
-                <br>
-                <form action="./lightoff">
-                    <input type="submit" value="Light off" />
-                </form>
-                <p>LED state: {self.state}</p>
-                <h2>Fetch New Value</h2>
-                <form action="./value">
-                    <input type="submit" value="Fetch value" />
-                </form>
-                <p>Fetched value: {self.random_value}</p>
-            </body>
-            </html>
-            """
-        return str(html)
-    
+        html = open('/web/view/index.html', 'r').read()
+        html = html.replace("{state}", self.model.state)
+        html = html.replace("{random_value}", str(self.model.random_value))
+        return html
+
     def action(self):
         led = Pin('LED', Pin.OUT)
 
@@ -80,21 +60,22 @@ class Web_server:
                         print('Request_error:', request)
                     recv = self.process_request(request, led)
                     if recv is not None:
-                        if type(recv) == int:
-                            self.random_value = recv
+                        # Update model state based on response
+                        if isinstance(recv, int):
+                            self.model.random_value = recv
                         else:
-                            self.state = recv
+                            self.model.state = recv
                         
-                        print("Current state:", self.state)
+                        print("Current state:", self.model.state)
                         # Generate HTML response
                         response = self.webpage()  
                         # Send the HTTP response and close the connection
-                        print("process 1:",self.connection_id)
-                        self.network.esp_sendData(self.connection_id,'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')  # 如果接收到的数据不为空，则回传
+                        print("process 1:", self.connection_id)
+                        self.network.esp_sendData(self.connection_id, 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
                         utime.sleep_ms(300)
-                        print("process 2:",self.connection_id)
+                        print("process 2:", self.connection_id)
                         self.network.esp_sendData(self.connection_id, response)
                         utime.sleep_ms(300)
-                        print("process 3:",self.connection_id)
+                        print("process 3:", self.connection_id)
             except OSError as e:
                 print('Connection closed:', e)

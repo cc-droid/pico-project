@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from machine import Pin
-from modules import webserver
+from web.controller import process
 
 
 # 主程序入口
@@ -12,6 +12,6 @@ if __name__ == "__main__":
     #sample.tcp_server('360WiFi-EE3B0D','ccdroid91', '8080')
     #sample.udp_sample('360WiFi-EE3B0D','ccdroid91', '192.168.8.94', 8080, 1010)
 
-    web_server = webserver.Web_server()
+    web_server = process.WebServer()
     web_server.setup_tcp('360WiFi-EE3B0D','ccdroid91', '8080')
     web_server.action()
