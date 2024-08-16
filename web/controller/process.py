@@ -72,10 +72,10 @@ class WebServer:
                         # Send the HTTP response and close the connection
                         print("process 1:", self.connection_id)
                         self.network.esp_sendData(self.connection_id, 'HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
-                        utime.sleep_ms(300)
                         print("process 2:", self.connection_id)
+                        utime.sleep(1)
                         self.network.esp_sendData(self.connection_id, response)
-                        utime.sleep_ms(300)
+                        utime.sleep(1)
                         print("process 3:", self.connection_id)
             except OSError as e:
                 print('Connection closed:', e)
