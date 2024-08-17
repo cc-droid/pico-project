@@ -1,4 +1,3 @@
-# model/model.py
 import random
 
 class DataModel:
@@ -10,5 +9,9 @@ class DataModel:
         self.state = status
 
     def fetch_random_value(self):
-        self.random_value = random.randint(0, 20)
-        return self.random_value
+        try:
+            self.random_value = random.randint(0, 20)
+            return self.random_value
+        except ValueError as e:
+            print(f"Error generating random value: {e}")
+            return 0

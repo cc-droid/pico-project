@@ -1,4 +1,3 @@
-<!-- view/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,15 +57,15 @@
     <div class="container">
         <h1>IOT Server</h1>
         <h2>LED Control</h2>
-        <form action="./lighton">
+        <form action="/lighton">
             <input type="submit" value="Light on" />
         </form>
-        <form action="./lightoff">
+        <form action="/lightoff">
             <input type="submit" value="Light off" />
         </form>
         <p>LED state: <span class="status">{state}</span></p>
         <h2>Fetch New Value</h2>
-        <form action="./value">
+        <form action="/value">
             <input type="submit" value="Fetch value" />
         </form>
         <p>Fetched value: <span class="status">{random_value}</span></p>
