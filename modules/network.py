@@ -18,10 +18,24 @@ class Network:
                     return True
         return False
     
-    # 发送数据
-    def esp_sendData(self, ID, data):
-        self.esp_sendCMD('AT+CIPSEND='+str(ID)+','+str(len(data)),'>')
-        self.esp_uart.write(data)
+    def esp_sendData(self, ID, data, retries=3):
+        """
+        发送数据到指定的 ID。
+        :param ID: 连接 ID
+        :param data: 要发送的数据
+        :param retries: 发送失败时的重试次数
+        :return: 成功返回 True，失败返回 False
+        """
+        for attempt in range(retries):
+            # 发送 CIPSEND 命令并等待 '>' 响应
+            if self.esp_sendCMD('AT+CIPSEND=' + str(ID) + ',' + str(len(data)), '>'):
+                self.esp_uart.write(data)  # 发送数据
+                return True
+            else:
+                print(f"Attempt {attempt + 1}/{retries} failed to send data. Retrying...")
+                utime.sleep(1)  # 等待一秒后重试
+        print("Failed to send data after multiple attempts.")
+        return False
 
         # 接收数据
     def esp_rcvData(self):
