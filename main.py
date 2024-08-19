@@ -30,9 +30,9 @@ async def do_web():
 # Create an Event Loop
 loop = uasyncio.get_event_loop()
 # Create a task to run the main function
-loop.create_task(main())
+#loop.create_task(main())
 loop.create_task(do_web())
-loop.create_task(blink_led())
+#loop.create_task(blink_led())
 
 try:
     # Run the event loop indefinitely
